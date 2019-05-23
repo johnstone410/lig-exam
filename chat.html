@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>LIG Exam - Chat App</title>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css?v=20192">
+	<style>
+		span > .btn-default, button.btn-default {
+			padding: 7px;
+			font-weight: normal;
+		}
+
+		.message-wrapper {
+			position: relative;
+		}
+
+		.message-wrapper p {
+			background-color: #8CE10A;
+			max-width: 80%;
+			border-radius: 5px;
+			padding: 10px;
+			color: white;
+			margin-bottom: 5px;
+			position: relative;
+			margin-left: 10px;
+		}
+		
+
+
+		.message-wrapper-arrow {
+			border-color: transparent #8CE10A;
+			border-style: solid;
+			border-width: 7px 7px 7px 0px;
+			height: 0px;
+			width: 0px;
+			content: '';
+			position: absolute;
+			top: 40%;
+			left: 5px;
+
+		}
+
+		.you .message-wrapper-arrow  {
+			border-width: 7px 0px 7px 7px;
+			right: 5px;
+			left: unset;
+		}
+
+		.message-wrapper.you p {
+			margin-right: 10px;
+			margin-left: 20%;
+			text-align: left;
+		}
+	</style>
+</head>
+<body onload="isLogin()">
+	<main>
+		<div style="position: relative;" class="border-bottom-gray">
+			<h3 class="text-center" style="padding-bottom: 0px;">Chat app </h3>
+			 <span style="position: absolute;top: 0; right: 0;"><button class="btn btn-default" onclick="logout()">Log out</button></span>
+		</div>
+		<div id="conversations" class="border-bottom-gray mb-20">
+			
+		</div>
+		<div class="input-group w-100">
+			<input type="text" class="w-80" placeholder="Start a new message" id="message" style="margin-right: 10px;"/>
+			<button id="send" class="btn btn-default" onclick="sendMessage()" style="width: calc(20% - 15px);">send</button>	
+		</div>
+
+	</main>
+	<!-- include db -->
+	<script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-firestore.js"></script>
+	<script>
+		var db = null;
+		var unsubscribe = null;
+
+		var conversations = document.getElementById("conversations");
+		function isLogin() {
+			//console.log(sessionStorage.getItem('user'), 'wtf');
+			if(sessionStorage.getItem('user') !== null) {
+
+				var firebaseConfig = {
+				  apiKey: "AIzaSyDfd7ceuR5AbdTuhJnHgyhmYxna_xSGqBE",
+				  authDomain: "lig-exam-67823.firebaseapp.com",
+				  projectId: "lig-exam-67823",
+				};
+				// Initialize Firebase
+				firebase.initializeApp(firebaseConfig);
+
+				db = firebase.firestore();
+				console.log('login sia');
+				unsubscribe = db.collection("messages")
+					.orderBy('created', 'asc')
+					.onSnapshot(function(snapshot) {
+						conversations.innerHTML = '';
+						snapshot.forEach(function (doc) {
+							//console.log(doc.data())
+							var message =  doc.data().message;
+							var user = JSON.parse(doc.data().user);
+							var sessionUser =  JSON.parse(sessionStorage.getItem('user'));
+							console.log(user, sessionUser);
+						    conversations.innerHTML += 
+						    `<div class="message-wrapper ${(user.username === sessionUser.username) ? 'you' : ''}">
+						    	<p>${doc.data().message}</p>
+						    	<small class="text-gray">${(user.username === sessionUser.username) ? 'You' : user.username}</small>
+						    	<div class="message-wrapper-arrow"></div>
+						    </div>
+						    `;
+
+						});
+						conversations.scrollTop = conversations.scrollHeight;
+					})
+
+
+
+
+			} else {
+				alert('not authorized');
+				window.location.href="index.html";
+			}
+		}
+
+		function sendMessage() {
+			if(db) {
+				var message = document.getElementById('message');
+				if(message.value.trim() !== '' || message.value.trim() !== undefined || message.value.trim() !== null) {
+					db.collection("messages").add({
+						message: message.value,
+						user: sessionStorage.getItem('user'),
+						created: firebase.firestore.Timestamp.now() 
+					}).then(function(doc) {
+						message.value = '';
+						document.getElementById('conversations').scrollTop += 100;
+					})
+				}
+			} else {
+				throw 'DB not initialized..';
+			}
+		}
+
+		function setNickname() {
+			var nickname = document.getElementById("nickname").value;
+
+			if(nickname.trim() !== '') {
+				db.collection("users").doc(JSON.parse(sessionStorage.getItem('user')).id)
+					.update({ nickname: nickname})
+					.then(function(snapshot) {
+						console.log('user updated')
+					})
+			}
+		}
+		function logout() {
+			sessionStorage.removeItem('user');
+			unsubscribe();
+			window.location.href = "index.html";
+		}
+	</script>
+</body>
+</html>

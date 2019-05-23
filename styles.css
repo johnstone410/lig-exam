@@ -1,0 +1,92 @@
+body {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 1rem;
+}
+
+main {
+	max-width: 375px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+h3 {
+	padding-bottom: 20px;
+}
+
+input {
+	border: none;
+	background-color: #f6f7fb;
+	text-indent: 15px;
+	padding: 12.5px 0px;
+	border-radius: 5px;
+}
+
+input, button {
+	font-size: 1rem;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.p-20 {
+	padding: 20px;
+}
+
+.mb-20 {
+	margin-bottom: 20px;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.btn {
+
+	padding: 12.5px;
+	border-radius: 5px;
+	border: 1px solid #8CE11C;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	color: #fff;
+
+}
+
+.btn-primary {
+	background-color: #8CE10A;
+}
+
+.btn-default {
+	background-color: #696969;
+	color: white;
+	border: none;
+}
+
+.text-gray {
+	color: gray;
+}
+
+.float-right {
+	float: right;
+}
+
+.border-bottom-gray {
+	border-bottom: 1px solid lightgray;
+	
+}
+
+.w-80 {
+	width: 80%;
+}
+
+#conversations {
+	height: 450px;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column
+}
+
+#conversations .you {
+	margin-right: 0;
+	text-align: right;
+}

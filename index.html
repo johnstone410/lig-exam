@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>LIG Exam - Chat App</title>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css?v=2019">
+</head>
+<body>
+	<main>
+		<h3 class="w-100 text-center mb-20 border-bottom-gray">Chat App</h3>
+		<form method="POST" id="login-signup" class="mb-20">
+			<input type="text" id="username" class="w-100 mb-20" placeholder="User name">
+			<input type="password" id="password" class="w-100 mb-20" placeholder="password">
+			<button type="submit" class="btn btn-primary w-100 text-center">Sign up / Log in</button>
+		</form>
+		<small class="text-gray mt-20">By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use. Others will be able to find you by searching for your email address or phone number you provided.</small>
+	</main>
+	
+	
+	<!-- include db -->
+	<script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-firestore.js"></script>
+	<script src="db.js"></script>
+
+	
+	<script>
+
+
+		var loginSignup = document.getElementById('login-signup');
+		var username = document.getElementById('username');
+		var password = document.getElementById('password');
+
+		//var db = firebase.firestore();
+
+		var firebaseConfig = {
+		  apiKey: "AIzaSyDfd7ceuR5AbdTuhJnHgyhmYxna_xSGqBE",
+		  authDomain: "lig-exam-67823.firebaseapp.com",
+		  projectId: "lig-exam-67823",
+		};
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+
+		var db = firebase.firestore();
+		loginSignup.addEventListener('submit', function(e) {
+			e.preventDefault();
+			db.collection('users')
+				.where('username', '==', username.value)
+				.where('password', '==', password.value)
+				.get()
+				.then(function(snapshot) { 
+					if(snapshot.size > 0) {// exists do login
+						snapshot.forEach(function(doc) {
+							//console.log(JSON.stringify(doc.data()));
+							sessionStorage.setItem("user", JSON.stringify({ id: doc.id, ...doc.data()}));
+							//sessionStorage.setItem("id", doc.id);
+							window.location.href = "chat.html";
+						});
+					} else { // do signup and login
+						db.collection("users")
+							.add({ username: username.value, password: password.value, nickname: username.value})
+							.then(function(doc) {
+								sessionStorage.setItem("user", JSON.stringify({ id: doc.id, ...doc.data()}));
+								window.location.href = "chat.html";
+							})
+					}
+					//console.log(snapshot.size);
+				})
+				.catch(function(err) {
+					console.log(err);
+					console.log('not existed');
+				})
+		});
+	</script>
+</body>
+</html>
